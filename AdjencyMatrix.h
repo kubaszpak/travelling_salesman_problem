@@ -6,9 +6,10 @@
 #include <cstddef>
 #include <vector>
 #include <fstream>
-#include <string>
+#include <cstring>
 #include <iomanip>
 #include <algorithm>
+#include <string>
 
 class AdjencyMatrix
 {
@@ -21,8 +22,8 @@ public:
     void print();
     void delete_vector();
     bool is_empty();
-    int OPT;
     void brute_force_tsp();
+    int OPT;
 
 private:
     std::vector<std::vector<int>> matrix;
