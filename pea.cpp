@@ -6,7 +6,7 @@ using namespace std;
 int main()
 {
 
-    std::string file_name = "instances/m11.atsp";
+    std::string file_name = "instances/m12.atsp";
     AdjencyMatrix matrix = AdjencyMatrix(file_name);
     matrix.print();
 

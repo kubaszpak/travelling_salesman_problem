@@ -23,6 +23,7 @@ public:
     void delete_vector();
     bool is_empty();
     void brute_force_tsp();
+    void brute_force_tsp_set_first();
     int OPT;
 
 private:
