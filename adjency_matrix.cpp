@@ -1,12 +1,18 @@
-#include "AdjencyMatrix.h"
+#include "adjency_matrix.h"
 
-int AdjencyMatrix::max_int = std::numeric_limits<int>::max();
+int adjency_matrix::max_int = std::numeric_limits<int>::max();
 
-AdjencyMatrix::AdjencyMatrix()
+adjency_matrix::adjency_matrix()
 {
 }
 
-AdjencyMatrix::AdjencyMatrix(std::string file_name, bool is_directed)
+adjency_matrix::adjency_matrix(const adjency_matrix &adjency_matrix)
+{
+    this->matrix = adjency_matrix.matrix;
+    this->number_of_vertices = adjency_matrix.number_of_vertices;
+}
+
+adjency_matrix::adjency_matrix(std::string file_name, bool is_directed)
 {
     // std::cout << is_directed << std::endl;
     std::ifstream file(file_name);
@@ -42,7 +48,15 @@ AdjencyMatrix::AdjencyMatrix(std::string file_name, bool is_directed)
                     }
                     else
                     {
-                        matrix[i][j] = edge_weight;
+                        if (i == j)
+                        {
+                            matrix[i][j] = max_int;
+                        }
+                        else
+                        {
+                            matrix[i][j] = edge_weight;
+                        }
+
                         if (!is_directed)
                         {
                             matrix[i][j] = edge_weight;
@@ -62,35 +76,97 @@ AdjencyMatrix::AdjencyMatrix(std::string file_name, bool is_directed)
     }
 }
 
-AdjencyMatrix::~AdjencyMatrix()
+adjency_matrix::~adjency_matrix()
 {
     delete_vector();
 }
 
-void AdjencyMatrix::fill_with_inifinites(int number_of_vertices)
+int adjency_matrix::reduce_rows()
 {
-    matrix.resize(number_of_vertices, std::vector<int>(number_of_vertices, AdjencyMatrix::max_int));
+    int reduced_cost = 0;
+    for (int i = 0; i < this->number_of_vertices; i++)
+    {
+        int min_value_this_row = max_int;
+        for (int j = 0; j < this->number_of_vertices; j++)
+        {
+            // if (i == j)
+            //     continue;
+
+            if (matrix[i][j] < min_value_this_row)
+                min_value_this_row = matrix[i][j];
+        }
+
+        reduced_cost += min_value_this_row;
+
+        for (int j = 0; j < this->number_of_vertices; j++)
+        {
+            if (i == j)
+                continue;
+
+            matrix[i][j] -= min_value_this_row;
+        }
+    }
+
+    return reduced_cost;
 }
 
-void AdjencyMatrix::delete_vector()
+int adjency_matrix::reduce_columns()
+{
+    int reduced_cost = 0;
+    for (int j = 0; j < this->number_of_vertices; j++)
+    {
+        int min_value_this_column = max_int;
+        for (int i = 0; i < this->number_of_vertices; i++)
+        {
+            // if (i == j)
+            //     continue;
+
+            if (matrix[i][j] < min_value_this_column)
+                min_value_this_column = matrix[i][j];
+        }
+
+        reduced_cost += min_value_this_column;
+
+        for (int i = 0; i < this->number_of_vertices; i++)
+        {
+            if (i == j)
+                continue;
+
+            matrix[i][j] -= min_value_this_column;
+        }
+    }
+
+    return reduced_cost;
+}
+
+int adjency_matrix::reduce_matrix() {
+    return this->reduce_rows() + this->reduce_columns();
+}
+
+void adjency_matrix::fill_with_inifinites(int number_of_vertices)
+{
+    matrix.resize(number_of_vertices, std::vector<int>(number_of_vertices, adjency_matrix::max_int));
+}
+
+void adjency_matrix::delete_vector()
 {
     matrix.clear();
 }
 
-bool AdjencyMatrix::is_empty()
+bool adjency_matrix::is_empty()
 {
     return matrix.empty();
 }
 
-int AdjencyMatrix::get(int i, int j)
+int adjency_matrix::get(int i, int j)
 {
     return this->matrix[i][j];
 }
 
-void AdjencyMatrix::print()
+void adjency_matrix::print()
 {
     std::cout << std::endl
-              << "--- AdjencyMatrix ---" << std::endl;
+              << "--- adjency_matrix ---" << std::endl;
     std::cout << "      ";
     for (int i = 0; i < number_of_vertices; i++)
     {
@@ -102,7 +178,7 @@ void AdjencyMatrix::print()
         std::cout << std::setw(3) << i << "   ";
         for (int j = 0; j < number_of_vertices; j++)
         {
-            if (matrix[i][j] != AdjencyMatrix::max_int)
+            if (matrix[i][j] != adjency_matrix::max_int)
             {
                 std::cout << std::setw(3) << matrix[i][j] << " ";
             }
@@ -117,7 +193,7 @@ void AdjencyMatrix::print()
     std::cout << std::endl;
 }
 
-void AdjencyMatrix::brute_force_tsp()
+void adjency_matrix::brute_force_tsp()
 {
 
     std::vector<int> paths;
@@ -201,7 +277,7 @@ void AdjencyMatrix::brute_force_tsp()
     std::cout << current_best_path << std::endl;
 }
 
-void AdjencyMatrix::brute_force_tsp_set_first()
+void adjency_matrix::brute_force_tsp_set_first()
 {
 
     std::vector<int> paths;

@@ -11,12 +11,13 @@
 #include <algorithm>
 #include <string>
 
-class AdjencyMatrix
+class adjency_matrix
 {
 public:
-    AdjencyMatrix();
-    ~AdjencyMatrix();
-    AdjencyMatrix(std::string file_name, bool is_directed = true);
+    adjency_matrix();
+    ~adjency_matrix();
+    adjency_matrix(const adjency_matrix &adjency_matrix);
+    adjency_matrix(std::string file_name, bool is_directed = true);
     int get(int i, int j);
     void fill_with_inifinites(int number_of_vertices);
     void print();
@@ -24,9 +25,12 @@ public:
     bool is_empty();
     void brute_force_tsp();
     void brute_force_tsp_set_first();
+    int reduce_rows();
+    int reduce_columns();
+    int reduce_matrix();
     int OPT;
 
-private:
+    // private:
     std::vector<std::vector<int>> matrix;
     int number_of_vertices;
     static int max_int;
