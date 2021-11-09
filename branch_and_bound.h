@@ -9,10 +9,11 @@
 
 struct Node
 {
-    const Node *parent;
+    Node *parent;
     adjency_matrix matrix;
     int cost;
     int vertex;
+    int level;
 
     Node(const adjency_matrix &matrix)
     {
@@ -36,6 +37,18 @@ struct Node
         this->matrix.print();
         std::cout << std::endl
                   << std::endl;
+    }
+
+    void traceback()
+    {
+        Node *node = (Node *)this;
+        std::cout << "From the end: ";
+        while (node->parent != nullptr)
+        {
+            std::cout << node->vertex << " ";
+            node = node->parent;
+        }
+        std::cout << std::endl;
     }
 };
 

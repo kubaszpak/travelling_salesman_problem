@@ -28,6 +28,7 @@ public:
     int reduce_rows();
     int reduce_columns();
     int reduce_matrix();
+    void set_INF(int i, int j);
     int OPT;
 
     // private:

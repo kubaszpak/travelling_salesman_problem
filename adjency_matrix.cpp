@@ -10,6 +10,7 @@ adjency_matrix::adjency_matrix(const adjency_matrix &adjency_matrix)
 {
     this->matrix = adjency_matrix.matrix;
     this->number_of_vertices = adjency_matrix.number_of_vertices;
+    this->OPT = adjency_matrix.OPT;
 }
 
 adjency_matrix::adjency_matrix(std::string file_name, bool is_directed)
@@ -96,14 +97,18 @@ int adjency_matrix::reduce_rows()
                 min_value_this_row = matrix[i][j];
         }
 
-        reduced_cost += min_value_this_row;
-
-        for (int j = 0; j < this->number_of_vertices; j++)
+        if (min_value_this_row != max_int)
         {
-            if (i == j)
-                continue;
 
-            matrix[i][j] -= min_value_this_row;
+            reduced_cost += min_value_this_row;
+
+            for (int j = 0; j < this->number_of_vertices; j++)
+            {
+                if (this->matrix[i][j] == max_int)
+                    continue;
+
+                matrix[i][j] -= min_value_this_row;
+            }
         }
     }
 
@@ -125,22 +130,36 @@ int adjency_matrix::reduce_columns()
                 min_value_this_column = matrix[i][j];
         }
 
-        reduced_cost += min_value_this_column;
-
-        for (int i = 0; i < this->number_of_vertices; i++)
+        if (min_value_this_column != max_int)
         {
-            if (i == j)
-                continue;
+            reduced_cost += min_value_this_column;
 
-            matrix[i][j] -= min_value_this_column;
+            for (int i = 0; i < this->number_of_vertices; i++)
+            {
+                if (this->matrix[i][j] == max_int)
+                    continue;
+
+                matrix[i][j] -= min_value_this_column;
+            }
         }
     }
 
     return reduced_cost;
 }
 
-int adjency_matrix::reduce_matrix() {
+int adjency_matrix::reduce_matrix()
+{
     return this->reduce_rows() + this->reduce_columns();
+}
+
+void adjency_matrix::set_INF(int i, int j)
+{
+    for (int k = 0; k < this->number_of_vertices; k++)
+    {
+        this->matrix[i][k] = max_int;
+        this->matrix[k][j] = max_int;
+    }
+    this->matrix[j][0] = max_int;
 }
 
 void adjency_matrix::fill_with_inifinites(int number_of_vertices)
