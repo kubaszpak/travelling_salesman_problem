@@ -9,16 +9,15 @@
 
 struct Node
 {
-    Node *parent;
     adjency_matrix matrix;
     int cost;
     int vertex;
     int level;
+    std::vector<int> path;
 
     Node(const adjency_matrix &matrix)
     {
         this->matrix = adjency_matrix(matrix);
-        this->parent = nullptr;
         this->vertex = 0;
         this->cost = 0;
     }
@@ -30,9 +29,9 @@ struct Node
 
     void print()
     {
+        int parent = (this->path.size() > 1) ? this->path[this->path.size() - 2] : -1;
         std::cout << "Node - cost: " << this->cost << std::endl
-                  << "Parent: " << this->parent->vertex
-                  << std::endl
+                  << "Parent: " << parent << std::endl
                   << "New vertex: " << this->vertex;
         this->matrix.print();
         std::cout << std::endl
@@ -41,13 +40,13 @@ struct Node
 
     void traceback()
     {
-        Node *node = (Node *)this;
-        std::cout << "From the end: ";
-        while (node->parent != nullptr)
+        std::cout << "Path: ";
+        for (int i = 0; i < this->path.size(); i++)
         {
-            std::cout << node->vertex << " ";
-            node = node->parent;
+            std::cout << this->path[i] << " ";
         }
+        if (level == matrix.number_of_vertices - 1)
+            std::cout << "0";
         std::cout << std::endl;
     }
 };
@@ -55,7 +54,8 @@ struct Node
 class branch_and_bound
 {
 public:
-    static void branch_and_bound_tsp();
+    static void branch_and_bound_tsp(std::string file_name);
+    // static void branch_and_bound_tsp_fixed(std::string file_name);
 };
 
 #endif /* BRANCH_AND_BOUND_H */

@@ -29,12 +29,13 @@ public:
     int reduce_columns();
     int reduce_matrix();
     void set_INF(int i, int j);
-    int OPT;
 
-    // private:
-    std::vector<std::vector<int>> matrix;
     int number_of_vertices;
+    int OPT;
     static int max_int;
+
+private:
+    std::vector<std::vector<int>> matrix;
 };
 
 #endif /* ADJENCY_MATRIX_H */

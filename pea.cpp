@@ -7,19 +7,19 @@ using namespace std;
 int main()
 {
 
-    // std::string file_name = "instances/m12.atsp";
-    // adjency_matrix matrix = adjency_matrix(file_name);
-    // matrix.print();
+    std::string file_name = "instances/gr17.tsp";
 
     // Pomiar czasu
+    // matrix.print();
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    // matrix.brute_force_tsp();
-    branch_and_bound::branch_and_bound_tsp();
+    // adjency_matrix matrix = adjency_matrix(file_name);
+    // matrix.brute_force_tsp_set_first();
+    branch_and_bound::branch_and_bound_tsp(file_name);
     std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
-    // std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
-    // std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << "[ns]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
+    std::cout << "Time difference = " << std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin).count() << "[ns]" << std::endl;
 
     return 0;
 }
