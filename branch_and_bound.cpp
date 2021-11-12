@@ -1,5 +1,7 @@
 #include "branch_and_bound.h"
 
+#define MAX_VALUE 100000
+
 #define LOG(x) std::cout << x << std::endl;
 
 struct Comparator
@@ -16,7 +18,6 @@ Node *create_head(adjency_matrix &matrix)
 
     node->cost += node->matrix.reduce_matrix();
     node->path.push_back(0);
-    // node->matrix.print();
     node->level = 0;
 
     return node;
@@ -74,6 +75,8 @@ void branch_and_bound::branch_and_bound_tsp(std::string file_name)
 
                 // new_node->print();
                 // new_node->traceback();
+                // std::cout << std::endl
+                //           << std::endl;
             }
         }
 
@@ -85,84 +88,96 @@ struct FixedComparator
 {
     bool operator()(const Node *ln, const Node *rn)
     {
-        return ln->cost + (ln->matrix.number_of_vertices - ln->level) * 100000 > rn->cost + (rn->matrix.number_of_vertices - rn->level) * 100000;
-        // prawy jest lepszy bo ma mniejszy koszt
-        // ale lewy ma wiekszy poziom wiec moze powinien byc lepszy ((?))
+        /* MAX_VALUE represents a constant mathematical ceiling of the edge cost in an instance, used to lower the priority of the nodes with low levels
+        This strategy helps the algorithm in determining an optimal solution, that can be then used to reduce the number of nodes that need to be evaluated
+        This approach is slower, but less memory-heavy, because by generating some solutions on the go, it allows the pruning of the tree */
+        return ln->cost + (ln->matrix.number_of_vertices - ln->level) * MAX_VALUE > rn->cost + (rn->matrix.number_of_vertices - rn->level) * MAX_VALUE;
     }
 };
 
-// void branch_and_bound::branch_and_bound_tsp_fixed(std::string file_name)
-// {
-//     adjency_matrix matrix = adjency_matrix(file_name);
-//     // matrix.print();
-//     int best_cost = matrix.max_int;
-//     std::vector<int> best_path;
+void branch_and_bound::branch_and_bound_tsp_fixed(std::string file_name)
+{
+    adjency_matrix matrix = adjency_matrix(file_name);
+    int OPT = matrix.OPT;
+    // matrix.print();
+    int best_cost = matrix.max_int;
+    std::vector<int> best_path;
 
-//     Node *head = create_head(matrix);
+    Node *head = create_head(matrix);
 
-//     std::priority_queue<Node *, std::vector<Node *>, FixedComparator> queue;
+    std::priority_queue<Node *, std::vector<Node *>, FixedComparator> queue;
 
-//     queue.push(head);
+    queue.push(head);
+    Node *node;
 
-//     while (!queue.empty())
-//     {
-//         Node *node = queue.top();
-//         queue.pop();
-//         if (node->cost > best_cost)
-//         {
-//             delete node;
-//             while (!queue.empty())
-//             {
-//                 Node *free_node = queue.top();
-//                 queue.pop();
-//                 delete free_node;
-//             }
-//         }
+    while (!queue.empty())
+    {
+        node = queue.top();
+        queue.pop();
 
-//         if (node->level == node->matrix.number_of_vertices - 1)
-//         {
-//             if (node->cost < best_cost)
-//             {
-//                 best_cost = node->cost;
-//                 best_path = node->path;
-//                 node->print();
-//             }
-//             else
-//             {
-//                 delete node;
-//                 continue;
-//             }
-//             if (queue.empty())
-//             {
-//                 node->traceback();
-//                 std::cout << node->cost << std::endl;
-//                 std::cout << "OPT: " << node->matrix.OPT << std::endl;
-//                 delete node;
-//                 break;
-//             }
-//             Node *new_top = queue.top();
-//             if (node->cost < new_top->cost)
-//             {
-//                 queue.pop();
-//                 delete new_top;
-//                 queue.push(node);
-//                 break;
-//             }
-//         }
+        if (node->cost >= best_cost)
+        {
+            if (node->level == node->matrix.number_of_vertices - 1)
+            {
+                delete node;
+                break;
+            }
+            delete node;
+            continue;
+        }
 
-//         for (int i = 0; i < node->matrix.number_of_vertices; i++)
-//         {
-//             if (node->matrix.get(node->vertex, i) != std::numeric_limits<int>::max())
-//             {
-//                 Node *new_node = create_node(node, i);
-//                 new_node->cost = node->cost + node->matrix.get(node->vertex, i) + new_node->matrix.reduce_matrix();
-//                 queue.push(new_node);
+        if (node->level == node->matrix.number_of_vertices - 1)
+        {
+            best_cost = node->cost;
+            best_path = node->path;
+            std::cout << "New solution: " << best_cost << std::endl;
+            for (int i = 0; i < best_path.size(); i++)
+            {
+                std::cout << best_path[i] << " ";
+            }
+            std::cout << std::endl
+                      << std::endl;
+            continue;
+        }
 
-//                 // new_node->print();
-//                 new_node->traceback();
-//             }
-//         }
+        for (int i = 0; i < node->matrix.number_of_vertices; i++)
+        {
+            if (node->matrix.get(node->vertex, i) != std::numeric_limits<int>::max())
+            {
+                Node *new_node = create_node(node, i);
+                new_node->cost = node->cost + node->matrix.get(node->vertex, i) + new_node->matrix.reduce_matrix();
 
-//         delete node;
-//     }
-// }
+                if (new_node->cost < best_cost)
+                {
+                    queue.push(new_node);
+                }
+                else
+                {
+                    delete new_node;
+                }
+
+                // new_node->print();
+                // new_node->traceback();
+                // std::cout << "Cost: " << new_node->cost << std::endl;
+            }
+        }
+
+        delete node;
+    }
+
+    while (!queue.empty())
+    {
+        Node *free_node = queue.top();
+        queue.pop();
+        delete free_node;
+    }
+    // node->traceback();
+    // delete node;
+    std::cout << "OPT: " << OPT << std::endl;
+    std::cout << "Best solution: " << best_cost << std::endl;
+    for (int i = 0; i < best_path.size(); i++)
+    {
+        std::cout << best_path[i] << " ";
+    }
+    std::cout << std::endl;
+}

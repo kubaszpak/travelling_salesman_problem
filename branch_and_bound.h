@@ -34,8 +34,6 @@ struct Node
                   << "Parent: " << parent << std::endl
                   << "New vertex: " << this->vertex;
         this->matrix.print();
-        std::cout << std::endl
-                  << std::endl;
     }
 
     void traceback()
@@ -55,7 +53,7 @@ class branch_and_bound
 {
 public:
     static void branch_and_bound_tsp(std::string file_name);
-    // static void branch_and_bound_tsp_fixed(std::string file_name);
+    static void branch_and_bound_tsp_fixed(std::string file_name);
 };
 
 #endif /* BRANCH_AND_BOUND_H */

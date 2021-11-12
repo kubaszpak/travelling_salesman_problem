@@ -60,7 +60,7 @@ adjency_matrix::adjency_matrix(std::string file_name, bool is_directed)
 
                         if (!is_directed)
                         {
-                            matrix[i][j] = edge_weight;
+                            matrix[j][i] = edge_weight;
                         }
                     }
                 }
