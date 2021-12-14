@@ -60,7 +60,8 @@ public:
     std::vector<int> inverse(int start, int offset);
     std::vector<int> swap(int i, int j);
     void check(std::vector<int> const &candidate, int k, int m);
-    // int getRandomInt(int i, int j);
+    Node random_initial();
+
 private:
     std::vector<int> best_solution;
     int best_cost;

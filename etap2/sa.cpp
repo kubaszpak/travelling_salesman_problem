@@ -5,7 +5,8 @@ sa::sa() {}
 sa::sa(const adjency_matrix &matrix)
 {
     this->cost_matrix = matrix;
-    Node initial = nearest_neighbour();
+    // Node initial = nearest_neighbour();
+    Node initial = random_initial();
     this->best_cost = initial.cost;
     this->current_cost = initial.cost;
     this->best_solution = initial.path;
@@ -30,6 +31,30 @@ void print_path(std::vector<int> const &path)
     std::cout << best_path << std::endl;
 }
 
+Node sa::random_initial()
+{
+    int number_of_vertices = this->cost_matrix.number_of_vertices;
+
+    std::vector<int> path;
+
+    for (int i = 0; i < number_of_vertices; i++)
+    {
+        path.push_back(i);
+    }
+
+    std::random_shuffle(path.begin(), path.end());
+
+    Node node;
+    node.matrix = this->cost_matrix;
+    node.cost = calculate_tour_cost(path);
+    node.path = path;
+    node.level = number_of_vertices - 1;
+    node.start_vertex = path[0];
+    node.print();
+
+    return node;
+}
+
 Node sa::nearest_neighbour()
 {
     Node node;
@@ -47,10 +72,6 @@ Node sa::nearest_neighbour()
             int smallest_cost_vertex = -1;
             for (int k = 0; k < number_of_vertices; k++)
             {
-                // if (last_vertex == k)
-                // {
-                //     continue;
-                // }
                 int cost_from_last_vertex_to_k = node.matrix.get(last_vertex, k);
 
                 if (cost_from_last_vertex_to_k < smallest_cost_from_last_vertex)
@@ -73,7 +94,6 @@ Node sa::nearest_neighbour()
             best_node = node;
         }
     }
-    // best_node.print();
     return best_node;
 }
 
@@ -118,7 +138,7 @@ std::vector<int> sa::swap(int i, int j)
 
 double sa::prob(int candidate_cost)
 {
-    return exp((-1) * (abs(candidate_cost - this->current_cost)) / this->temperature);
+    return exp((this->current_cost - candidate_cost) / this->temperature);
 }
 
 void sa::check(std::vector<int> const &candidate, int k, int m)
@@ -139,11 +159,21 @@ void sa::check(std::vector<int> const &candidate, int k, int m)
             this->best_solution = candidate;
         }
     }
-    else if (getRandom() < prob(candidate_cost))
+    // else if (getRandom() < prob(candidate_cost))
+    // {
+    //     this->current_cost = candidate_cost;
+    //     this->current_solution = candidate;
+    // }
+    else
     {
-        // std::cout << "2" << std::endl;
-        this->current_cost = candidate_cost;
-        this->current_solution = candidate;
+        double random = getRandom();
+        double probability = prob(candidate_cost);
+        // std::cout << "DEBUG: " << random << " " << probability << " " << (random < probability) << std::endl;
+        if (random < probability)
+        {
+            this->current_cost = candidate_cost;
+            this->current_solution = candidate;
+        }
     }
 }
 
@@ -168,7 +198,6 @@ void sa::simulated_annealing()
             // INVERSE
             // int start_city = getRandomInt(0, number_of_vertices - 2);
             // int offset = getRandomInt(start_city + 2, number_of_vertices);
-            // // std::cout << "Swap cities start: " << start_city << " and offset: " << offset << std::endl;
             // std::vector<int> candidate = inverse(start_city, offset);
 
             // SWAP
