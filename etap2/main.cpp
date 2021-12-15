@@ -11,7 +11,7 @@ int main()
     // Time measurement
     chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 
-    std::string file_name = "instances/ulysses22.tsp";
+    std::string file_name = "instances/gr48.tsp";
 
     adjency_matrix matrix = adjency_matrix(file_name);
     // matrix.print();

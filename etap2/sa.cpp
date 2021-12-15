@@ -15,6 +15,7 @@ sa::sa(const adjency_matrix &matrix)
     this->initial_cost = initial.cost;
     double PRD = (double)(initial.cost - cost_matrix.OPT) * 100 / cost_matrix.OPT;
     std::cout << "K: 0 M: 0 " << initial.cost << " " << std::setprecision(2) << std::fixed << PRD << "%" << std::endl;
+    no_optimization_in_last_iteration = true;
 }
 
 void print_path(std::vector<int> const &path)
@@ -53,6 +54,10 @@ Node sa::random_initial()
     node.print();
 
     return node;
+}
+
+void sa::shuffle_current_path()
+{
 }
 
 Node sa::nearest_neighbour()
@@ -151,6 +156,7 @@ void sa::check(std::vector<int> const &candidate, int k, int m)
         this->current_solution = candidate;
         if (candidate_cost < this->best_cost)
         {
+            no_optimization_in_last_iteration = false;
             // print_path(candidate);
             double PRD = (double)(candidate_cost - cost_matrix.OPT) * 100 / cost_matrix.OPT;
             std::cout << "K: " << k << " M: " << m << " " << candidate_cost << " " << std::setprecision(2) << std::fixed << PRD << "%" << std::endl;
@@ -180,17 +186,18 @@ void sa::check(std::vector<int> const &candidate, int k, int m)
 void sa::simulated_annealing()
 {
     // CONSTANTS
-    double cooling_rate = 0.95; // alternatives [0,99+, 0,995]
+    double cooling_rate = 0.9999; // alternatives [0,99+, 0,995]
     int number_of_vertices = cost_matrix.number_of_vertices;
-    int K = 10000;
-    int start_temperature = 1000;
+    int K = 100;
+    int start_temperature = 10000;
     int m = 0;
     // int M = 1000;
-    double temperature_stop_condition = 0.000001;
+    double temperature_stop_condition = 0.01;
 
     for (int s = 0; s < K; ++s)
     {
         m = 0;
+        no_optimization_in_last_iteration = true;
         // this->temperature = std::numeric_limits<double>::max(); // 1.79769e+308
         this->temperature = start_temperature;
         while (temperature > temperature_stop_condition)
@@ -205,14 +212,18 @@ void sa::simulated_annealing()
             int j = -1;
             while (i == j)
             {
-                i = getRandomInt(0, number_of_vertices - 1);
-                j = getRandomInt(0, number_of_vertices - 1);
+                i = getRandomInt(0, number_of_vertices);
+                j = getRandomInt(0, number_of_vertices);
             }
             std::vector<int> candidate = swap(i, j);
 
             check(candidate, s, m);
             temperature = temperature * cooling_rate;
             m++;
+        }
+        if (no_optimization_in_last_iteration)
+        {
+            shuffle_current_path();
         }
     }
     double PRD = (double)(initial_cost - cost_matrix.OPT) * 100 / cost_matrix.OPT;

@@ -61,6 +61,7 @@ public:
     std::vector<int> swap(int i, int j);
     void check(std::vector<int> const &candidate, int k, int m);
     Node random_initial();
+    void shuffle_current_path();
 
 private:
     std::vector<int> best_solution;
@@ -70,6 +71,8 @@ private:
     adjency_matrix cost_matrix;
     double temperature;
     int initial_cost;
+    bool no_optimization_in_last_iteration;
+
 };
 
 #endif /* SA_H */
