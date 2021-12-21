@@ -9,20 +9,19 @@ int main()
 {
     srand(time(NULL));
     // Time measurement
-    chrono::steady_clock::time_point begin = chrono::steady_clock::now();
 
-    std::string file_name = "instances/gr48.tsp";
+    std::string filenames[] = {"instances/br17.atsp", "instances/gr24.tsp", "instances/ftv33.atsp", "instances/ftv38.atsp", "instances/ftv44.atsp", "instances/gr48.tsp", "instances/berlin52.tsp", "instances/brazil58.tsp"};
 
-    adjency_matrix matrix = adjency_matrix(file_name);
-    // matrix.print();
-    sa(matrix).simulated_annealing();
-    // std::vector<int> path{3, 17, 21, 16, 1, 2, 15, 11, 12, 13, 6, 5, 18, 19, 20, 9, 8, 10, 4, 14, 7, 0};
-    // std::cout << sa(matrix).calculate_tour_cost(path) << std::endl;
-
-    chrono::steady_clock::time_point end = chrono::steady_clock::now();
-
-    cout << "Time difference = " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << "[µs]" << endl;
-    cout << "Time difference = " << chrono::duration_cast<chrono::nanoseconds>(end - begin).count() << "[ns]" << endl;
+    for (int i = 7; i < 8; i++)
+    {
+        std::cout << "Instance: " << i << " " << filenames[i] << std::endl;
+        chrono::steady_clock::time_point begin = chrono::steady_clock::now();
+        adjency_matrix matrix = adjency_matrix(filenames[i]);
+        sa(matrix).simulated_annealing();
+        chrono::steady_clock::time_point end = chrono::steady_clock::now();
+        cout << "Time difference = " << chrono::duration_cast<chrono::microseconds>(end - begin).count() << "[µs]" << endl;
+        cout << "Time difference = " << chrono::duration_cast<chrono::nanoseconds>(end - begin).count() << "[ns]" << endl;
+    }
 
     return 0;
 }

@@ -59,7 +59,7 @@ public:
     int calculate_tour_cost(std::vector<int> const &path);
     std::vector<int> inverse(int start, int offset);
     std::vector<int> swap(int i, int j);
-    void check(std::vector<int> const &candidate, int k, int m);
+    void check(std::vector<int> const &candidate, int k, int m, long long iteracje);
     Node random_initial();
     void shuffle_current_path();
 
@@ -72,7 +72,6 @@ private:
     double temperature;
     int initial_cost;
     bool no_optimization_in_last_iteration;
-
 };
 
 #endif /* SA_H */

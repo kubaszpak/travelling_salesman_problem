@@ -5,8 +5,12 @@ sa::sa() {}
 sa::sa(const adjency_matrix &matrix)
 {
     this->cost_matrix = matrix;
+
+    // NEAREST_NEIGHBOUR
     // Node initial = nearest_neighbour();
+    // RANDOM
     Node initial = random_initial();
+
     this->best_cost = initial.cost;
     this->current_cost = initial.cost;
     this->best_solution = initial.path;
@@ -14,7 +18,7 @@ sa::sa(const adjency_matrix &matrix)
     this->temperature = std::numeric_limits<double>::max(); // 1.79769e+308
     this->initial_cost = initial.cost;
     double PRD = (double)(initial.cost - cost_matrix.OPT) * 100 / cost_matrix.OPT;
-    std::cout << "K: 0 M: 0 " << initial.cost << " " << std::setprecision(2) << std::fixed << PRD << "%" << std::endl;
+    // std::cout << "K: 0 M: 0 " << initial.cost << " " << std::setprecision(2) << std::fixed << PRD << "%" << std::endl;
     no_optimization_in_last_iteration = true;
 }
 
@@ -51,13 +55,14 @@ Node sa::random_initial()
     node.path = path;
     node.level = number_of_vertices - 1;
     node.start_vertex = path[0];
-    node.print();
 
     return node;
 }
 
 void sa::shuffle_current_path()
 {
+    std::random_shuffle(current_solution.begin(), current_solution.end());
+    current_cost = calculate_tour_cost(current_solution);
 }
 
 Node sa::nearest_neighbour()
@@ -137,7 +142,6 @@ std::vector<int> sa::swap(int i, int j)
     int temp = new_solution[i];
     new_solution[i] = new_solution[j];
     new_solution[j] = temp;
-    // print_path()
     return new_solution;
 }
 
@@ -146,59 +150,45 @@ double sa::prob(int candidate_cost)
     return exp((this->current_cost - candidate_cost) / this->temperature);
 }
 
-void sa::check(std::vector<int> const &candidate, int k, int m)
+void sa::check(std::vector<int> const &candidate, int k, int m, long long iterations)
 {
     int candidate_cost = calculate_tour_cost(candidate);
     if (candidate_cost < this->current_cost)
     {
-        // std::cout << "1" << std::endl;
         this->current_cost = candidate_cost;
         this->current_solution = candidate;
         if (candidate_cost < this->best_cost)
         {
             no_optimization_in_last_iteration = false;
-            // print_path(candidate);
             double PRD = (double)(candidate_cost - cost_matrix.OPT) * 100 / cost_matrix.OPT;
-            std::cout << "K: " << k << " M: " << m << " " << candidate_cost << " " << std::setprecision(2) << std::fixed << PRD << "%" << std::endl;
+            // std::cout << " " << iterations <<  "%" << std::endl;
+            std::cout << iterations << " " << std::setprecision(2) << std::fixed << PRD << std::endl;
 
             this->best_cost = candidate_cost;
             this->best_solution = candidate;
         }
     }
-    // else if (getRandom() < prob(candidate_cost))
-    // {
-    //     this->current_cost = candidate_cost;
-    //     this->current_solution = candidate;
-    // }
-    else
+    else if (getRandom() < prob(candidate_cost))
     {
-        double random = getRandom();
-        double probability = prob(candidate_cost);
-        // std::cout << "DEBUG: " << random << " " << probability << " " << (random < probability) << std::endl;
-        if (random < probability)
-        {
-            this->current_cost = candidate_cost;
-            this->current_solution = candidate;
-        }
+        this->current_cost = candidate_cost;
+        this->current_solution = candidate;
     }
 }
 
 void sa::simulated_annealing()
 {
     // CONSTANTS
-    double cooling_rate = 0.9999; // alternatives [0,99+, 0,995]
-    int number_of_vertices = cost_matrix.number_of_vertices;
+    double cooling_rate = 0.99999;
     int K = 100;
     int start_temperature = 10000;
-    int m = 0;
-    // int M = 1000;
     double temperature_stop_condition = 0.01;
-
-    for (int s = 0; s < K; ++s)
+    long long iterations = 0;
+    int number_of_vertices = cost_matrix.number_of_vertices;
+    int m = 0;
+    for (int k = 0; k < K; ++k)
     {
         m = 0;
         no_optimization_in_last_iteration = true;
-        // this->temperature = std::numeric_limits<double>::max(); // 1.79769e+308
         this->temperature = start_temperature;
         while (temperature > temperature_stop_condition)
         {
@@ -217,9 +207,10 @@ void sa::simulated_annealing()
             }
             std::vector<int> candidate = swap(i, j);
 
-            check(candidate, s, m);
+            check(candidate, k, m, iterations);
             temperature = temperature * cooling_rate;
             m++;
+            iterations++;
         }
         if (no_optimization_in_last_iteration)
         {
