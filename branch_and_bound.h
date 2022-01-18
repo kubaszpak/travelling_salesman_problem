@@ -52,8 +52,8 @@ struct Node
 class branch_and_bound
 {
 public:
-    static void branch_and_bound_tsp(std::string file_name);
-    static void branch_and_bound_tsp_fixed(std::string file_name);
+    static void branch_and_bound_tsp(adjency_matrix &matrix);
+    static void branch_and_bound_tsp_fixed(adjency_matrix &matrix);
 };
 
 #endif /* BRANCH_AND_BOUND_H */

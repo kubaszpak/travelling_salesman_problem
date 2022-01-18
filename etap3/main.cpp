@@ -6,7 +6,7 @@ int main()
 {
     srand(time(NULL));
 
-    adjency_matrix matrix = adjency_matrix("instances/m16.atsp");
+    adjency_matrix matrix = adjency_matrix("instances/gr120.tsp");
 
     genetic genetic(matrix);
     genetic.run();

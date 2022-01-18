@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <climits>
 #include "adjency_matrix.h"
 
 struct Path
@@ -50,7 +51,7 @@ public:
     void sort_population();
     std::vector<Path> create_mating_pool();
     std::vector<int> breed(Path &parent1, Path &parent2);
-    std::vector<Path> breed_mating_pool(std::vector<Path> mating_pool);
+    std::vector<Path> breed_mating_pool(std::vector<Path> &mating_pool);
     void mutate_single(std::vector<int> &route, double mutation_rate);
     void mutate_all(std::vector<Path> &mating_pool, double mutation_rate);
     void assign_tour_costs(std::vector<Path> &mating_pool);

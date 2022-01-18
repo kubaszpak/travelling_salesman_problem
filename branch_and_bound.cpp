@@ -6,7 +6,7 @@
 
 struct Comparator
 {
-    bool operator()(const Node *ln, const Node *rn)
+    bool operator()(const Node *ln, const Node *rn) const
     {
         return ln->cost > rn->cost;
     }
@@ -34,10 +34,9 @@ Node *create_node(Node *parent, int vertex)
     return new_node;
 }
 
-void branch_and_bound::branch_and_bound_tsp(std::string file_name)
+void branch_and_bound::branch_and_bound_tsp(adjency_matrix &matrix)
 {
-    adjency_matrix matrix = adjency_matrix(file_name);
-    matrix.print();
+    // matrix.print();
 
     Node *head = create_head(matrix);
 
@@ -86,7 +85,7 @@ void branch_and_bound::branch_and_bound_tsp(std::string file_name)
 
 struct FixedComparator
 {
-    bool operator()(const Node *ln, const Node *rn)
+    bool operator()(const Node *ln, const Node *rn) const
     {
         /* MAX_VALUE represents a constant mathematical ceiling of the edge cost in an instance, used to lower the priority of the nodes with low levels
         This strategy helps the algorithm in determining an optimal solution, that can be then used to reduce the number of nodes that need to be evaluated
@@ -95,11 +94,11 @@ struct FixedComparator
     }
 };
 
-void branch_and_bound::branch_and_bound_tsp_fixed(std::string file_name)
+void branch_and_bound::branch_and_bound_tsp_fixed(adjency_matrix &matrix)
 {
-    adjency_matrix matrix = adjency_matrix(file_name);
-    int OPT = matrix.OPT;
     // matrix.print();
+
+    int OPT = matrix.OPT;
     int best_cost = matrix.max_int;
     std::vector<int> best_path;
 
@@ -135,7 +134,7 @@ void branch_and_bound::branch_and_bound_tsp_fixed(std::string file_name)
             {
                 std::cout << best_path[i] << " ";
             }
-            std::cout << std::endl
+            std::cout << "0" << std::endl
                       << std::endl;
             continue;
         }
@@ -171,13 +170,11 @@ void branch_and_bound::branch_and_bound_tsp_fixed(std::string file_name)
         queue.pop();
         delete free_node;
     }
-    // node->traceback();
-    // delete node;
     std::cout << "OPT: " << OPT << std::endl;
     std::cout << "Best solution: " << best_cost << std::endl;
     for (int i = 0; i < best_path.size(); i++)
     {
         std::cout << best_path[i] << " ";
     }
-    std::cout << std::endl;
+    std::cout << "0" << std::endl;
 }

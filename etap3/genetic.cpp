@@ -1,9 +1,14 @@
 #include "genetic.h"
 
-const int pop_size = 300;
+const int pop_size = 1000;
 const int elite_size = 30;
-const int number_of_generations = 20000;
-const double mutation_rate = 0.02;
+const int number_of_generations = 5000;
+const double mutation_rate = 0.05;
+
+// const int pop_size = 1500;
+// const int elite_size = 50;
+// const int number_of_generations = 1000;
+// const double mutation_rate = 0.02;
 
 // const int pop_size = 5;
 // const int elite_size = 3;
@@ -85,7 +90,7 @@ std::vector<Path> genetic::create_mating_pool()
         mating_pool.push_back(population.at(i));
     }
 
-    assert(population.size() == pop_size);
+    // assert(population.size() == pop_size);
     assert(pop_size >= elite_size);
 
     // std::cout << "Population size: " << population.size() << std::endl;
@@ -139,7 +144,7 @@ std::vector<int> genetic::breed(Path &parent1, Path &parent2)
 
     child.push_back(0);
 
-    for (int i = start; i < end; i++)
+    for (int i = start; i <= end; i++)
     {
         child.push_back(parent1.route.at(i));
     }
@@ -160,7 +165,7 @@ std::vector<int> genetic::breed(Path &parent1, Path &parent2)
     return child;
 }
 
-std::vector<Path> genetic::breed_mating_pool(std::vector<Path> mating_pool)
+std::vector<Path> genetic::breed_mating_pool(std::vector<Path> &mating_pool)
 {
     std::vector<Path> new_mating_pool;
 
@@ -199,6 +204,7 @@ void genetic::mutate_single(std::vector<int> &route, double mutation_rate)
             int temp = route[second_index];
             route[second_index] = route[i];
             route[i] = temp;
+            break;
         }
     }
 }
@@ -222,13 +228,18 @@ void genetic::assign_tour_costs(std::vector<Path> &mating_pool)
 void genetic::run()
 {
     matrix.print();
+    int best_answer = INT_MAX;
+    std::vector<int> best_route;
     for (int i = 0; i < pop_size; i++)
     {
         std::vector<int> randomPath = random_initial();
         population.push_back(Path(calculate_tour_cost(randomPath), randomPath));
     }
 
-    std::cout << "First answer: " << population.at(0).cost << std::endl;
+    int first_answer = population.at(0).cost;
+    double PRD = (double)(first_answer - OPT) * 100 / OPT;
+
+    std::cout << "-1 " << first_answer << " " << std::setprecision(2) << std::fixed << PRD << std::endl;
 
     std::vector<Path> mating_pool;
     for (int i = 0; i < number_of_generations; i++)
@@ -236,11 +247,20 @@ void genetic::run()
         sort_population();
         // std::cout << "Sorted population: " << std::endl;
         // print_population();
+
+        if (population.at(0).cost < best_answer)
+        {
+            best_answer = population.at(0).cost;
+            best_route = population.at(0).route;
+            double PRD = (double)(best_answer - OPT) * 100 / OPT;
+            // std::cout << " " << iterations <<  "%" << std::endl;
+            std::cout << i << " " << best_answer << " " << std::setprecision(2) << std::fixed << PRD << std::endl;
+        }
         mating_pool = create_mating_pool();
         // std::cout << "-------------------" << std::endl;
         // std::cout << "Mating pool: " << std::endl;
         // print_mating_pool(mating_pool);
-        mating_pool = breed_mating_pool(mating_pool);
+        breed_mating_pool(mating_pool);
         // std::cout << "-------------------" << std::endl;
         // std::cout << "Mating pool after breeding: " << std::endl;
         // print_mating_pool(mating_pool);
@@ -257,6 +277,13 @@ void genetic::run()
 
     sort_population();
 
-    std::cout << "Final answer: "
-              << population.at(0).cost << std::endl;
+    PRD = (double)(best_answer - OPT) * 100 / OPT;
+
+    std::cout << "F "
+              << best_answer << " " << std::setprecision(2) << std::fixed << PRD << std::endl;
+
+    PRD = (double)(first_answer - OPT) * 100 / OPT;
+
+    std::cout << "0 " << first_answer << " " << std::setprecision(2) << std::fixed << PRD << std::endl;
+    print_path(best_route);
 }
